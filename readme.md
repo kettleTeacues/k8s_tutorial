@@ -1,4 +1,26 @@
 # tips
+
+## 公開されているChartをダウンロードする
+```sh
+$ helm search repo mongo
+# NAME                                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+# stable/mongodb                          7.8.10          4.2.4           DEPRECATED NoSQL document-oriented database tha...
+# stable/mongodb-replicaset               3.17.2          3.6             DEPRECATED - NoSQL document-oriented database t...
+# stable/prometheus-mongodb-exporter      2.8.1           v0.10.0         DEPRECATED A Prometheus exporter for MongoDB me...
+# stable/unifi                            0.10.2          5.12.35         DEPRECATED - Ubiquiti Network's Unifi Controller  
+
+$ helm pull stable/mongodb # ダウンロード
+$ tar xvzf mongodb-7.8.10.tgz # 展開
+$ helm install mongo ./mongodb # インストール
+```
+
+## 公開されているチャートをパラメータを渡して実行する
+```sh
+mkdir testmongo
+helm show values bitnami/mongodb > testmongo/values.yaml # パラメータを取得してvalues.ymlを作成
+helm install my-mongodb bitnami/mongodb -f testmongo/values.yaml # パラメータを渡して実行
+```
+
 ## サーバー再起動時にダッシュボードに接続できない。
 ```sh
 kubectl get all -n kubernetes-dashboard
