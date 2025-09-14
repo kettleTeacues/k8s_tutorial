@@ -19,6 +19,9 @@ $ helm install mongo ./mongodb # インストール
 mkdir testmongo
 helm show values bitnami/mongodb > testmongo/values.yaml # パラメータを取得してvalues.ymlを作成
 helm install my-mongodb bitnami/mongodb -f testmongo/values.yaml # パラメータを渡して実行
+
+helm install my-mongodb bitnami/mongodb --set persistence.enabled=true # --setの場合
+helm upgrade my-mongodb bitnami/mongodb --set persistence.enabled=false # 既存のhelmリソースを更新
 ```
 
 ## サーバー再起動時にダッシュボードに接続できない。
