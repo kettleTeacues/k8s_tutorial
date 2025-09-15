@@ -22,11 +22,13 @@ metadata:
   name: mongodb-data-pvc
   namespace: mongodb
 spec:
+  storageClassName: retaind-storage
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 5Gi
+  
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -34,6 +36,7 @@ metadata:
   name: mongodb-config-pvc
   namespace: mongodb
 spec:
+  storageClassName: retaind-storage
   accessModes:
     - ReadWriteOnce
   resources:
@@ -59,7 +62,7 @@ spec:
       containers:
       - name: mongodb
         image: mongo:4.4.18
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 27017
         env:
@@ -105,7 +108,7 @@ spec:
       containers:
       - name: mongo-express
         image: mongo-express
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8081
         env:
