@@ -142,8 +142,8 @@ spec:
   ports:
     - port: 27017
       targetPort: 27017
-      # protocol: TCP
-  # type: LoadBalancer
+      protocol: TCP
+  type: LoadBalancer
 
 ---
 apiVersion: v1
