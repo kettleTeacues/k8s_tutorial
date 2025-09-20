@@ -22,7 +22,7 @@ metadata:
   name: mongodb-data-pvc
   namespace: mongodb
 spec:
-  storageClassName: retaind-storage
+  storageClassName: retained-storage
   accessModes:
     - ReadWriteOnce
   resources:
@@ -36,7 +36,7 @@ metadata:
   name: mongodb-config-pvc
   namespace: mongodb
 spec:
-  storageClassName: retaind-storage
+  storageClassName: retained-storage
   accessModes:
     - ReadWriteOnce
   resources:
