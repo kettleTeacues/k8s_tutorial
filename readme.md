@@ -28,11 +28,16 @@ helm upgrade my-mongodb bitnami/mongodb --set persistence.enabled=false # 既存
 ```sh
 kubectl get all -n kubernetes-dashboard
 kubectl delete deployment -n kubernetes-dashboard kubernetes-dashboard-kong
-helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
+    --create-namespace \
+    --namespace kubernetes-dashboard \
+    --set kong.image.repository=kong \
+    --set kong.image.tag="3.9.0"
 ```
 
 `kubectl get all -n kubernetes-dashboard`で`kubernetes-dashboard-kong`が立ち上がっていないことがある。
 下2行の命令で削除/再インストールすれば復旧する。
+[kong:3.9に関する参考](https://github.com/kubernetes/dashboard/issues/9955)
 
 ```sh
 # その他関連コマンド
