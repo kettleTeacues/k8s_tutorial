@@ -1,0 +1,24 @@
+# 入門Kubernetes Jobs・CronJob | zenn
+# https://zenn.dev/sasakiki/articles/c32c7abb0ef5b9
+
+# kubernetesのCronJob調べてみた | qiita
+# https://qiita.com/oguogura/items/a6c7b295849c62561d13
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: yf-cron
+spec:
+  # cron を使用した時間指定 | qiita
+  # https://qiita.com/nemutas/items/3f5816eabbf0eda5e6a9
+  #         分 時 日 月 曜日
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: yf-cron
+            image: 192.168.151.194:5000/yf
+            command: ["echo", "hello"]
+          restartPolicy: Never
