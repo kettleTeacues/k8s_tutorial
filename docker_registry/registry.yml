@@ -1,0 +1,75 @@
+# Docker のプライベートレジストリを構築し Kubernetes から利用する | qiita
+# https://qiita.com/tkarube/items/d3c008cc0dc9d139f819
+
+# k8s上にDockerプライベートレジストリ構築 | qiita
+# https://qiita.com/murata-tomohide/items/11ed68500c0a0db1d385
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: docker-registry
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: docker-registry-pvc
+  namespace: docker-registry
+spec:
+  storageClassName: default-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-registry-deployment
+  namespace: docker-registry
+  labels:
+    app: docker-registry-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-registry-deployment
+  template:
+    metadata:
+      labels:
+        app: docker-registry-deployment
+    spec:
+      tolerations:
+        # allow deploy control-plane
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: docker-registry
+          image: registry
+          ports:
+          - containerPort: 5000
+          volumeMounts:
+          - name: registry
+            mountPath: /var/lib/registry
+      volumes:
+        - name: registry
+          persistentVolumeClaim:
+            claimName: docker-registry-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: docker-registry-service
+  namespace: docker-registry
+spec:
+  type: LoadBalancer
+  selector:
+    app: docker-registry-deployment
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
