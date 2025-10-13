@@ -47,3 +47,53 @@ kubectl logs -n kubernetes-dashboard kubernetes-dashboard-kong-648658d45f-n4nc7
 # Kong Podの詳細情報を確認
 kubectl describe pod -n kubernetes-dashboard kubernetes-dashboard-kong-648658d45f-n4nc7
 ```
+
+## k8sでローカルのdocker.registryを立てたときの各種エラー
+### dockerでpush/pullできない。
+```sh
+$ docker push <hostname>:5000/busybox:1.36.1
+The push refers to repository [<hostname>:5000/busybox]
+Get "https://<hostname>:5000/v2/": http: server gave HTTP response to HTTPS client
+```
+
+httpsを想定しているのにhttpのレスポンスが返ってきた旨のエラー
+以下の通りエラー回避
+
+```sh
+sudo nano /etc/docker/daemon.json
+
+# /etc/docker/daemon.json
+{
+  "insecure-registries": ["<hostname>:5000"]
+}
+
+sudo systemctl reload docker
+```
+この操作は対象のレジストリにpush/pullしたいすべての端末で行う
+
+[Docker のプライベートレジストリを構築し Kubernetes から利用する | qiita](https://qiita.com/tkarube/items/d3c008cc0dc9d139f819)
+
+## k8sのノードでpullできない。
+```sh
+Failed to pull image "<hostname>:5000/toolbox": failed to pull and unpack image "<hostname>:5000/toolbox:latest": failed to resolve referenc ││ e "<hostname>:5000/toolbox:latest": failed to do request: Head "https://<hostname>:5000/v2/toolbox/manifests/latest": http: server gave HTTP response to HTTPS client
+```
+
+k8sではdockerがコンテナイメージをpullしているわけではない。
+例えばコンテナランタイムにcontainerdを採用している場合は以下の通りエラー回避する。
+
+```sh
+sudo nano /etc/containerd/config.toml
+
+# /etc/containerd/config.toml
+# (中略)
+      [plugins."io.containerd.grpc.v1.cri".registry.configs]
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."<hostname>:5000".tls]
+          insecure_skip_verify = true
+
+      [plugins."io.containerd.grpc.v1.cri".registry.headers]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."<hostname>:5000"]
+          endpoint = ["http://<hostname>:5000"]
+# (中略)
+```
