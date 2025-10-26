@@ -1,3 +1,15 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: yf-cron-secret
+type: Opaque
+stringData:
+  PG_URL: postgresql://admin:admin@192.168.151.193/yfinance
+  JQUANTS_URL: https://api.jquants.com/v1
+  JQUANTS_MAIL: jpx-jquants@piechika.com
+  JQUANTS_PASS: sG1048596jpx
+
+---
 # 入門Kubernetes Jobs・CronJob | zenn
 # https://zenn.dev/sasakiki/articles/c32c7abb0ef5b9
 
@@ -9,10 +21,11 @@ kind: CronJob
 metadata:
   name: yf-cron
 spec:
+  timeZone: "Asia/Tokyo"
   # cron を使用した時間指定 | qiita
   # https://qiita.com/nemutas/items/3f5816eabbf0eda5e6a9
   #         分 時 日 月 曜日
-  schedule: "*/1 * * * *"
+  schedule: "5 15 * * 1-5"
   jobTemplate:
     spec:
       template:
@@ -20,5 +33,8 @@ spec:
           containers:
           - name: yf-cron
             image: 192.168.151.194:5000/yf
-            command: ["echo", "hello"]
+            command: ["python", "commands/daily.py"]
+            envFrom:
+            - secretRef:
+                name: yf-cron-secret
           restartPolicy: Never
