@@ -4,7 +4,7 @@ metadata:
   name: yf-cron-secret
 type: Opaque
 stringData:
-  PG_URL: postgresql://admin:admin@192.168.151.193/yfinance
+  PG_URL: postgresql://admin:admin@192.168.151.196/yfinance
   JQUANTS_URL: https://api.jquants.com/v1
   JQUANTS_MAIL: jpx-jquants@piechika.com
   JQUANTS_PASS: sG1048596jpx
@@ -32,7 +32,7 @@ spec:
         spec:
           containers:
           - name: yf-cron
-            image: 192.168.151.194:5000/yf
+            image: 192.168.151.193:5000/yf
             command: ["python", "commands/daily.py"]
             envFrom:
             - secretRef:

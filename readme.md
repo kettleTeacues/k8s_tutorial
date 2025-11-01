@@ -96,4 +96,6 @@ sudo nano /etc/containerd/config.toml
         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."<hostname>:5000"]
           endpoint = ["http://<hostname>:5000"]
 # (中略)
+
+sudo systemctl restart containerd
 ```
