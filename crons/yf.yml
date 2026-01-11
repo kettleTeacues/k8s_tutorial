@@ -9,23 +9,23 @@ stringData:
   JQUANTS_MAIL: jpx-jquants@piechika.com
   JQUANTS_PASS: sG1048596jpx
 
----
 # 入門Kubernetes Jobs・CronJob | zenn
 # https://zenn.dev/sasakiki/articles/c32c7abb0ef5b9
 
 # kubernetesのCronJob調べてみた | qiita
 # https://qiita.com/oguogura/items/a6c7b295849c62561d13
 
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: yf-cron
+  name: yf-daily
 spec:
   timeZone: "Asia/Tokyo"
   # cron を使用した時間指定 | qiita
   # https://qiita.com/nemutas/items/3f5816eabbf0eda5e6a9
   #         分 時 日 月 曜日
-  schedule: "5 15 * * 1-5"
+  schedule: "31 15 * * 1-5"
   jobTemplate:
     spec:
       template:
@@ -34,6 +34,30 @@ spec:
           - name: yf-cron
             image: 192.168.151.193:5000/yf
             command: ["python", "commands/daily.py"]
+            envFrom:
+            - secretRef:
+                name: yf-cron-secret
+          restartPolicy: Never
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: yf-weekly
+spec:
+  timeZone: "Asia/Tokyo"
+  # cron を使用した時間指定 | qiita
+  # https://qiita.com/nemutas/items/3f5816eabbf0eda5e6a9
+  #         分 時 日 月 曜日
+  schedule: "0 0 * * 6"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: yf-cron
+            image: 192.168.151.193:5000/yf
+            command: ["python", "commands/weekly.py"]
             envFrom:
             - secretRef:
                 name: yf-cron-secret
