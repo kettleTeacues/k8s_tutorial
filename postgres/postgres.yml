@@ -131,13 +131,10 @@ kind: Service
 metadata:
   name: pgadmin-service
   namespace: postgres
-  labels:
-    app: pgadmin
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: pgadmin
   ports:
   - port: 80
     targetPort: 80
-    protocol: TCP

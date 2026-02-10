@@ -36,10 +36,9 @@ metadata:
   name: kubernetes-dashboard-lb
   namespace: kubernetes-dashboard
 spec:
-  type: LoadBalancer
-  ports:
-    - port: 443
-      protocol: TCP
-      targetPort: 8443
+  type: ClusterIP
   selector:
     app: kubernetes-dashboard-kong
+  ports:
+    - port: 443
+      targetPort: 8443
