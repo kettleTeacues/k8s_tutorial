@@ -4,10 +4,10 @@ metadata:
   name: yf-cron-secret
 type: Opaque
 stringData:
-  PG_URL: postgresql://admin:admin@192.168.151.196/yfinance
+  PG_URL: $PG_URL
   JQUANTS_URL: https://api.jquants.com/v1
-  JQUANTS_MAIL: jpx-jquants@piechika.com
-  JQUANTS_PASS: sG1048596jpx
+  JQUANTS_MAIL: $JQUANTS_MAIL
+  JQUANTS_PASS: $JQUANTS_PASS
 
 # 入門Kubernetes Jobs・CronJob | zenn
 # https://zenn.dev/sasakiki/articles/c32c7abb0ef5b9
