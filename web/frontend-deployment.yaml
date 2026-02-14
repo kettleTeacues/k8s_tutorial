@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: 192.168.151.193:5000/frontend:latest  # TODO: 実際のイメージに変更
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        # Next.jsからバックエンドAPIへの接続URL
+        # サーバーサイドレンダリング時はクラスタ内部のService名を使用
+        - name: NEXT_PUBLIC_API_URL
+          value: "http://backend-service:3000"
+        # クライアントサイドからのAPI呼び出し用（Ingressなどを経由する場合）
+        # - name: NEXT_PUBLIC_API_URL
+        #   value: "https://api.your-domain.com"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  labels:
+    app: frontend
+spec:
+  type: LoadBalancer  # 外部からアクセスする場合。NodePortやIngressも選択可能
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
