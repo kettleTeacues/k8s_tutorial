@@ -19,7 +19,11 @@ if [ -z "$BACKEND_ENDPOINT" ]; then
     echo "Error: BACKEND_ENDPOINT is not set in .env"
     exit 1
 fi
+if [ -z "$BASE_PATH" ]; then
+    echo "Error: BASE_PATH is not set in .env"
+    exit 1
+fi
 
-envsubst '$JQUANTS_MAIL $JQUANTS_PASS $PG_URL $BACKEND_ENDPOINT' < web/my_finance.yml | kubectl apply -f -
+envsubst '$JQUANTS_MAIL $JQUANTS_PASS $PG_URL $BACKEND_ENDPOINT $BASE_PATH' < web/my_finance.yml | kubectl apply -f -
 kubectl rollout restart deployment/backend-deployment
 kubectl rollout restart deployment/frontend-deployment
