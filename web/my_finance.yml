@@ -1,0 +1,92 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: myfinance-secret
+type: Opaque
+stringData:
+  PG_URL: $PG_URL
+  JQUANTS_URL: https://api.jquants.com/v1
+  JQUANTS_MAIL: $JQUANTS_MAIL
+  JQUANTS_PASS: $JQUANTS_PASS
+  BACKEND_ENDPOINT: $BACKEND_ENDPOINT
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: 192.168.151.193:5000/backend:latest  # TODO: 実際のイメージに変更
+        # command: ["/bin/sh", "-c", "sleep infinity"]
+        command: ["yarn", "start"]
+        envFrom:
+        - secretRef:
+            name: myfinance-secret
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: 192.168.151.193:5000/frontend:latest  # TODO: 実際のイメージに変更
+        # command: ["/bin/sh", "-c", "sleep infinity"]
+        command: ["yarn", "start"]
+        envFrom:
+        - secretRef:
+            name: myfinance-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  type: ClusterIP
+  selector:
+    app: backend
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
